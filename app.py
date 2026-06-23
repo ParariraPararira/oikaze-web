@@ -31,41 +31,106 @@ def load_prediction(date, jcd, rno):
     with open(path) as f:
         return json.load(f)
 
-def get_results_from_supabase(date):
+def get_ranking_from_supabase(date):
     if not supabase:
         return []
-    res = supabase.table("race_results").select("*").eq("ymd", date).execute()
-    return res.data or []
-
-def calc_stats(date, jcd):
-    rows = get_results_from_supabase(date)
-    rows = [r for r in rows if r["jcd"] == jcd and not r.get("skipped")]
+    res = supabase.table("race_results").select("*").eq("ymd", date).eq("skipped", False).execute()
+    rows = res.data or []
     if not rows:
-        return None
+        return []
 
-    hits_a = hits_b = total = invest = payout_sum = 0
+    # jcd別に集計
+    stats = {}
     for r in rows:
-        pred = load_prediction(date, jcd, r["rno"])
-        if not pred:
-            continue
-        total += 1
-        invest += 1200
-        kumiban = r.get("kumiban", "")
-        pay = r.get("haraimodoshi", 0) or 0
-        if kumiban in pred.get("pattern_a", []):
-            hits_a += 1
-            payout_sum += pay
-        elif kumiban in pred.get("pattern_b", []):
-            hits_b += 1
-            payout_sum += pay
+        jcd = r["jcd"]
+        if jcd not in stats:
+            stats[jcd] = {"jcd": jcd, "name": BASHO.get(jcd, jcd),
+                         "total": 0, "hits_a": 0, "hits_b": 0,
+                         "invest": 0, "payout": 0}
+        s = stats[jcd]
+        s["total"] += 1
+        s["invest"] += 1200
+        if r.get("hit_a"):
+            s["hits_a"] += 1
+            s["payout"] += r.get("haraimodoshi", 0) or 0
+        elif r.get("hit_b"):
+            s["hits_b"] += 1
+            s["payout"] += r.get("haraimodoshi", 0) or 0
 
-    if total == 0:
-        return None
-    hit_rate = (hits_a + hits_b) / total * 100
-    return_rate = payout_sum / invest * 100 if invest > 0 else 0
-    return {
-        "jcd": jcd,
-        "name": BASHO.get(jcd, jcd),
-        "total": total,
-        "hits_a": hits_a,
-        "hits_b": hits_b,
+    results = []
+    for jcd, s in stats.items():
+        if s["total"] == 0:
+            continue
+        hit_rate = (s["hits_a"] + s["hits_b"]) / s["total"] * 100
+        return_rate = s["payout"] / s["invest"] * 100 if s["invest"] > 0 else 0
+        results.append({
+            "jcd": jcd,
+            "name": s["name"],
+            "total": s["total"],
+            "hits_a": s["hits_a"],
+            "hits_b": s["hits_b"],
+            "hit_rate": round(hit_rate, 1),
+            "return_rate": round(return_rate, 1),
+        })
+
+    results.sort(key=lambda x: (-x["return_rate"], -x["hit_rate"]))
+    return results
+
+@app.route("/")
+def index():
+    return render_template("index.html", basho=BASHO)
+
+@app.route("/api/ranking/today")
+def api_ranking_today():
+    jst = datetime.utcnow() + timedelta(hours=9)
+    date = jst.strftime("%Y%m%d")
+    return jsonify(get_ranking_from_supabase(date)[:3])
+
+@app.route("/api/ranking/yesterday")
+def api_ranking_yesterday():
+    jst = datetime.utcnow() + timedelta(hours=9)
+    date = (jst - timedelta(days=1)).strftime("%Y%m%d")
+    return jsonify(get_ranking_from_supabase(date)[:3])
+
+@app.route("/api/results", methods=["POST"])
+def api_save_results():
+    data = request.json
+    date = data.get("date")
+    jcd = data.get("jcd")
+    races = data.get("races", [])
+    if supabase:
+        for r in races:
+            row = {
+                "ymd": date, "jcd": jcd, "rno": r["rno"],
+                "kumiban": r["trifecta"], "haraimodoshi": r.get("payout", 0),
+                "hit_a": False, "hit_b": False, "skipped": False,
+            }
+            supabase.table("race_results").upsert(row, on_conflict="ymd,jcd,rno").execute()
+    return jsonify({"status": "ok", "saved": len(races)})
+
+@app.route("/api/yosou", methods=["POST"])
+def api_yosou():
+    data = request.json
+    basho_code = data.get("basho")
+    race_no = data.get("race_no")
+    jst = datetime.utcnow() + timedelta(hours=9)
+    date = jst.strftime("%Y%m%d")
+    pred = load_prediction(date, basho_code, int(race_no))
+    if pred:
+        return jsonify({
+            "pattern_a": pred["pattern_a"],
+            "pattern_b": pred["pattern_b"],
+            "basho": BASHO.get(basho_code, basho_code),
+            "race_no": race_no,
+        })
+    return jsonify({
+        "pattern_a": ["1-2-3","1-2-4","1-3-2","1-3-4","1-4-2","1-4-3",
+                      "2-1-3","2-1-4","2-3-1","3-1-2","3-2-1","1-5-2"],
+        "pattern_b": ["1-2-3","1-3-2","2-1-3","2-3-1","3-1-2","3-2-1",
+                      "1-4-2","1-2-4","2-4-1","1-5-2","2-4-1","3-1-4"],
+        "basho": BASHO.get(basho_code, basho_code),
+        "race_no": race_no,
+    })
+
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=8080, debug=True)
