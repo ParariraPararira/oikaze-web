@@ -305,6 +305,9 @@ const y = jst.getUTCFullYear();
 const m = String(jst.getUTCMonth()+1).padStart(2,'0');
 const d = String(jst.getUTCDate()).padStart(2,'0');
 const todayStr = `${y}${m}${d}`;
+    const yDate = new Date(jst); yDate.setUTCDate(yDate.getUTCDate()-1);
+    const yy = yDate.getUTCFullYear(); const ym = String(yDate.getUTCMonth()+1).padStart(2,"0"); const yd = String(yDate.getUTCDate()).padStart(2,"0");
+    const yesterdayStr = `${yy}${ym}${yd}`;
 document.getElementById("today-date").textContent = `${y}.${m}.${d}`;
 
 // ① 本日開催
@@ -382,7 +385,7 @@ function switchTab(tab) {
     document.getElementById("rank-yesterday").style.display = "flex";
     if (!yesterdayLoaded) {
       yesterdayLoaded = true;
-      loadRanking("/api/ranking/yesterday", "rank-yesterday");
+      loadRanking(`/api/ranking/${yesterdayStr}`, "rank-yesterday");
     }
   }
 }
@@ -428,7 +431,7 @@ async function saveResults() {
   closeModal();
   showToast(`${races.length}レース保存しました`);
   // ランキング更新
-  loadRanking("/api/ranking/today", "rank-today");
+  loadRanking(`/api/ranking/${todayStr}`, "rank-today");
 }
 
 function showToast(msg) {
@@ -474,7 +477,7 @@ function predict() {
 
 // 初期ロード
 loadTodayBasho();
-loadRanking("/api/ranking/today", "rank-today");
+loadRanking(`/api/ranking/${todayStr}`, "rank-today");
 </script>
 </body>
 </html>

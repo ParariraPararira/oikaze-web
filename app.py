@@ -80,16 +80,8 @@ def get_ranking_from_supabase(date):
 def index():
     return render_template("index.html", basho=BASHO)
 
-@app.route("/api/ranking/today")
-def api_ranking_today():
-    jst = datetime.utcnow() + timedelta(hours=9)
-    date = jst.strftime("%Y%m%d")
-    return jsonify(get_ranking_from_supabase(date)[:3])
-
-@app.route("/api/ranking/yesterday")
-def api_ranking_yesterday():
-    jst = datetime.utcnow() + timedelta(hours=9)
-    date = (jst - timedelta(days=1)).strftime("%Y%m%d")
+@app.route("/api/ranking/<date>")
+def api_ranking_by_date(date):
     return jsonify(get_ranking_from_supabase(date)[:3])
 
 @app.route("/api/results", methods=["POST"])
