@@ -39,7 +39,6 @@ def get_ranking_from_supabase(date):
     if not rows:
         return []
 
-    # jcd別に集計
     stats = {}
     for r in rows:
         jcd = r["jcd"]
@@ -76,6 +75,41 @@ def get_ranking_from_supabase(date):
     results.sort(key=lambda x: (-x["return_rate"], -x["hit_rate"]))
     return results
 
+def get_boat1_ranking(date):
+    if not supabase:
+        return []
+    res = supabase.table("race_results").select("*").eq("ymd", date).eq("skipped", False).execute()
+    rows = res.data or []
+    if not rows:
+        return []
+
+    stats = {}
+    for r in rows:
+        jcd = r["jcd"]
+        if jcd not in stats:
+            stats[jcd] = {"jcd": jcd, "name": BASHO.get(jcd, jcd), "total": 0, "boat1_win": 0}
+        s = stats[jcd]
+        s["total"] += 1
+        kumiban = r.get("kumiban", "") or ""
+        if kumiban.startswith("1-"):
+            s["boat1_win"] += 1
+
+    results = []
+    for jcd, s in stats.items():
+        if s["total"] == 0:
+            continue
+        rate = s["boat1_win"] / s["total"] * 100
+        results.append({
+            "jcd": jcd,
+            "name": s["name"],
+            "total": s["total"],
+            "boat1_win": s["boat1_win"],
+            "boat1_rate": round(rate, 1),
+        })
+
+    results.sort(key=lambda x: -x["boat1_rate"])
+    return results[:3]
+
 @app.route("/")
 def index():
     return render_template("index.html", basho=BASHO)
@@ -83,6 +117,10 @@ def index():
 @app.route("/api/ranking/<date>")
 def api_ranking_by_date(date):
     return jsonify(get_ranking_from_supabase(date)[:3])
+
+@app.route("/api/ranking/boat1/<date>")
+def api_boat1_ranking(date):
+    return jsonify(get_boat1_ranking(date))
 
 @app.route("/api/results", methods=["POST"])
 def api_save_results():

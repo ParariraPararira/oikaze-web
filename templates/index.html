@@ -5,293 +5,285 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>oikaze</title>
 <style>
-  :root {
+:root {
     --bg: #e8f4f8; --bg2: #d0e8f0; --bg3: #b8dcea;
     --border: #a0c8e0; --accent: #00d4ff; --accent2: #ff6b35;
     --gold: #f5c842; --green: #00e676; --red: #ff4444;
     --text: #1a2a3a; --muted: #4a6080;
     --font-mono: 'Courier New', monospace;
     --font: -apple-system, 'Hiragino Sans', sans-serif;
-  }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { background: var(--bg); color: var(--text); font-family: var(--font); min-height: 100vh; }
-
-  header {
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: var(--bg); color: var(--text); font-family: var(--font); min-height: 100vh; }
+header {
     border-bottom: 1px solid var(--border); padding: 16px 20px;
     display: flex; align-items: center; gap: 12px;
     position: sticky; top: 0; background: var(--bg); z-index: 100;
-  }
-  .logo { font-family: var(--font-mono); font-size: 22px; font-weight: 700; color: var(--accent); letter-spacing: 2px; }
-  .logo span { color: var(--accent2); }
-  .date-badge { margin-left: auto; font-size: 12px; color: var(--muted); font-family: var(--font-mono); }
-
-  .section { padding: 20px; border-bottom: 1px solid var(--border); }
-  .section-label {
+}
+.logo { font-family: var(--font-mono); font-size: 22px; font-weight: 700; color: var(--accent); letter-spacing: 2px; }
+.logo span { color: var(--accent2); }
+.date-badge { margin-left: auto; font-size: 12px; color: var(--muted); font-family: var(--font-mono); }
+.section { padding: 20px; border-bottom: 1px solid var(--border); }
+.section-label {
     font-size: 10px; letter-spacing: 3px; color: var(--muted);
     text-transform: uppercase; margin-bottom: 14px;
     display: flex; align-items: center; gap: 8px;
-  }
-  .section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
-
-  /* ① 本日開催 */
-  .basho-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
-  .basho-chip {
+}
+.section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+.basho-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.basho-chip {
     background: var(--bg2); border: 1px solid var(--border);
     border-radius: 6px; padding: 10px 6px; text-align: center;
     font-size: 13px; cursor: pointer; transition: all 0.15s;
-  }
-  .basho-chip:hover, .basho-chip.active {
+}
+.basho-chip:hover, .basho-chip.active {
     border-color: var(--accent); color: var(--accent); background: rgba(0,212,255,0.08);
-  }
-  .basho-chip .code { font-size: 10px; color: var(--muted); font-family: var(--font-mono); margin-bottom: 4px; }
-  .basho-loading { color: var(--muted); font-size: 13px; text-align: center; padding: 16px; grid-column: 1/-1; }
-
-  /* ② タブ */
-  .tab-bar {
+}
+.basho-chip .code { font-size: 10px; color: var(--muted); font-family: var(--font-mono); margin-bottom: 4px; }
+.basho-loading { color: var(--muted); font-size: 13px; text-align: center; padding: 16px; grid-column: 1/-1; }
+.tab-bar {
     display: flex; gap: 0; margin-bottom: 14px;
     background: var(--bg2); border-radius: 8px; padding: 3px;
-  }
-  .tab-btn {
+}
+.tab-btn {
     flex: 1; padding: 8px; text-align: center; font-size: 13px;
     color: var(--muted); cursor: pointer; border-radius: 6px;
     transition: all 0.15s; border: none; background: none;
-  }
-  .tab-btn.active { background: var(--bg3); color: var(--text); font-weight: 600; }
-
-  .rank-list { display: flex; flex-direction: column; gap: 8px; }
-  .rank-item {
+}
+.tab-btn.active { background: var(--bg3); color: var(--text); font-weight: 600; }
+.rank-list { display: flex; flex-direction: column; gap: 8px; }
+.rank-item {
     background: var(--bg2); border: 1px solid var(--border);
-    border-radius: 8px; padding: 12px 14px;
-    display: flex; align-items: center; gap: 12px;
-  }
-  .rank-num { font-family: var(--font-mono); font-size: 18px; font-weight: 700; width: 28px; text-align: center; }
-  .rank-num.gold { color: var(--gold); }
-  .rank-num.silver { color: #aaa; }
-  .rank-num.bronze { color: #cd7f32; }
-  .rank-name { font-size: 15px; font-weight: 600; flex: 1; }
-  .rank-stats { text-align: right; }
-  .rank-return { font-family: var(--font-mono); font-size: 16px; font-weight: 700; color: var(--green); }
-  .rank-return.bad { color: var(--red); }
-  .rank-hit { font-size: 11px; color: var(--muted); margin-top: 2px; }
-  .rank-loading { color: var(--muted); font-size: 13px; text-align: center; padding: 16px; }
-
-  /* 結果入力ボタン */
-  .btn-input-result {
+    border-radius: 8px; padding: 12px 14px; display: flex; align-items: center; gap: 12px;
+}
+.rank-num { font-family: var(--font-mono); font-size: 18px; font-weight: 700; width: 28px; text-align: center; }
+.rank-num.gold { color: var(--gold); }
+.rank-num.silver { color: #aaa; }
+.rank-num.bronze { color: #cd7f32; }
+.rank-name { font-size: 15px; font-weight: 600; flex: 1; }
+.rank-stats { text-align: right; }
+.rank-return { font-family: var(--font-mono); font-size: 16px; font-weight: 700; color: var(--green); }
+.rank-return.bad { color: var(--red); }
+.rank-hit { font-size: 11px; color: var(--muted); margin-top: 2px; }
+.rank-loading { color: var(--muted); font-size: 13px; text-align: center; padding: 16px; }
+.btn-input-result {
     width: 100%; background: var(--bg2); color: var(--accent2);
     border: 1px solid var(--accent2); border-radius: 8px;
     padding: 12px; font-size: 14px; font-weight: 600;
     cursor: pointer; margin-top: 14px; transition: all 0.15s;
-  }
-  .btn-input-result:hover { background: rgba(255,107,53,0.1); }
-
-  /* 結果入力モーダル */
-  .modal-overlay {
+}
+.btn-input-result:hover { background: rgba(255,107,53,0.1); }
+.modal-overlay {
     display: none; position: fixed; inset: 0;
     background: rgba(0,0,0,0.8); z-index: 200;
     align-items: flex-end; justify-content: center;
-  }
-  .modal-overlay.show { display: flex; }
-  .modal {
+}
+.modal-overlay.show { display: flex; }
+.modal {
     background: var(--bg2); border-radius: 16px 16px 0 0;
     padding: 20px; width: 100%; max-height: 80vh; overflow-y: auto;
-  }
-  .modal-title { font-size: 15px; font-weight: 700; margin-bottom: 16px; }
-  .modal-row {
-    display: flex; align-items: center; gap: 8px;
-    margin-bottom: 10px;
-  }
-  .modal-row label { font-size: 13px; color: var(--muted); width: 28px; }
-  .modal-row input {
-    flex: 1; background: var(--bg3); border: 1px solid var(--border);
-    border-radius: 6px; padding: 8px 10px; color: var(--text);
-    font-size: 14px; font-family: var(--font-mono);
-  }
-  .modal-row input:focus { outline: none; border-color: var(--accent); }
-  .modal-row .pay-input { width: 100px; flex: none; }
-  .modal-actions { display: flex; gap: 8px; margin-top: 16px; }
-  .btn-modal-save {
+}
+.modal-title { font-size: 15px; font-weight: 700; margin-bottom: 16px; }
+.modal-row { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+.modal-row label { font-size: 13px; color: var(--muted); width: 28px; }
+.modal-row input {
+    flex: 1; background: var(--bg3);
+    border: 1px solid var(--border); border-radius: 6px; padding: 8px 10px;
+    color: var(--text); font-size: 14px; font-family: var(--font-mono);
+}
+.modal-row input:focus { outline: none; border-color: var(--accent); }
+.modal-row .pay-input { width: 100px; flex: none; }
+.modal-actions { display: flex; gap: 8px; margin-top: 16px; }
+.btn-modal-save {
     flex: 1; background: var(--accent); color: #000; border: none;
     border-radius: 8px; padding: 14px; font-size: 15px; font-weight: 700; cursor: pointer;
-  }
-  .btn-modal-cancel {
+}
+.btn-modal-cancel {
     background: var(--bg3); color: var(--muted); border: 1px solid var(--border);
     border-radius: 8px; padding: 14px 20px; font-size: 15px; cursor: pointer;
-  }
-  .modal-select-row { display: flex; gap: 8px; margin-bottom: 14px; }
-  .modal-select-row select {
-    flex: 1; background: var(--bg3); border: 1px solid var(--border);
-    border-radius: 6px; padding: 10px; color: var(--text); font-size: 14px;
-  }
-
-  /* ③ 予想エンジン */
-  .engine-form { display: flex; flex-direction: column; gap: 14px; }
-  select, input[type="number"] {
+}
+.modal-select-row { margin-bottom: 14px; }
+.modal-select-row select {
+    flex: 1; background: var(--bg3);
+    border: 1px solid var(--border); border-radius: 6px; padding: 10px;
+    color: var(--text); font-size: 14px; width: 100%;
+}
+select, input {
     width: 100%; background: var(--bg2); border: 1px solid var(--border);
     border-radius: 6px; padding: 12px 14px; color: var(--text);
     font-size: 15px; font-family: var(--font); appearance: none;
-  }
-  select:focus, input:focus { outline: none; border-color: var(--accent); }
-  .input-label { font-size: 11px; color: var(--muted); margin-bottom: 6px; letter-spacing: 1px; }
-  .boats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
-  .boat-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; padding: 10px; }
-  .boat-waku { font-family: var(--font-mono); font-size: 11px; color: var(--muted); margin-bottom: 6px; }
-  .boat-card input { padding: 6px 8px; font-size: 14px; margin-bottom: 4px; }
-  .upload-area {
+}
+select:focus, input:focus { outline: none; border-color: var(--accent); }
+.input-label { font-size: 11px; color: var(--muted); margin-bottom: 6px; letter-spacing: 1px; }
+.boats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.boat-card {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 8px; padding: 10px;
+}
+.boat-waku { font-family: var(--font-mono); font-size: 11px; color: var(--muted); margin-bottom: 6px; }
+.boat-card input { padding: 6px 8px; font-size: 14px; margin-bottom: 4px; }
+.upload-area {
     border: 1px dashed var(--border); border-radius: 8px; padding: 20px;
     text-align: center; color: var(--muted); font-size: 13px; cursor: pointer; transition: all 0.15s;
-  }
-  .upload-area:hover { border-color: var(--accent); color: var(--accent); background: rgba(0,212,255,0.04); }
-  .upload-area .icon { font-size: 28px; margin-bottom: 8px; }
-  .btn-predict {
+}
+.upload-area:hover { border-color: var(--accent); color: var(--accent); background: rgba(0,212,255,0.04); }
+.upload-area .icon { font-size: 28px; margin-bottom: 8px; }
+.btn-predict {
     width: 100%; background: var(--accent); color: #000; border: none;
     border-radius: 8px; padding: 16px; font-size: 16px; font-weight: 700;
     letter-spacing: 2px; cursor: pointer; transition: all 0.15s;
-  }
-  .btn-predict:hover { opacity: 0.85; }
-  .btn-predict:active { transform: scale(0.98); }
-
-  /* 結果 */
-  .result-section { display: none; padding: 20px; }
-  .result-section.show { display: block; }
-  .pattern-block { margin-bottom: 20px; }
-  .pattern-title { font-size: 11px; letter-spacing: 2px; color: var(--muted); margin-bottom: 10px; }
-  .tickets-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
-  .ticket {
+}
+.btn-predict:hover { opacity: 0.85; }
+.btn-predict:active { transform: scale(0.98); }
+.result-section { display: none; padding: 20px; }
+.result-section.show { display: block; }
+.pattern-block { margin-bottom: 20px; }
+.pattern-title { font-size: 11px; letter-spacing: 2px; color: var(--muted); margin-bottom: 10px; }
+.tickets-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+.ticket {
     background: var(--bg2); border: 1px solid var(--border); border-radius: 6px;
     padding: 10px; text-align: center; font-family: var(--font-mono);
     font-size: 16px; font-weight: 700; color: var(--accent); letter-spacing: 1px;
-  }
-  .ticket.pattern-b { color: var(--accent2); }
-  .result-header {
+}
+.ticket.pattern-b { color: var(--accent2); }
+.result-header {
     font-size: 13px; color: var(--muted); margin-bottom: 16px;
     padding: 10px 14px; background: var(--bg2); border-radius: 6px; font-family: var(--font-mono);
-  }
-  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
-  .loading-dot { animation: pulse 1s infinite; font-size: 24px; letter-spacing: 8px; }
-  .loading { display:none; text-align:center; padding:30px; color:var(--muted); }
-  .loading.show { display:block; }
-
-  .toast {
+}
+@keyframes pulse { 0%, 100%{opacity:1} 50%{opacity:0.3} }
+.loading-dot { animation: pulse 1s infinite; font-size: 24px; letter-spacing: 8px; }
+.loading { display:none; text-align:center; padding:30px; color:var(--muted); }
+.loading.show { display:block; }
+.toast {
     position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%);
     background: var(--green); color: #000; padding: 10px 20px;
     border-radius: 20px; font-size: 14px; font-weight: 700;
     opacity: 0; transition: opacity 0.3s; z-index: 300;
-  }
-  .toast.show { opacity: 1; }
+}
+.toast.show { opacity: 1; }
 </style>
 </head>
 <body>
-
 <header>
-  <div class="logo">oi<span>kaze</span></div>
-  <div class="date-badge" id="today-date"></div>
+    <div class="logo">oi<span>kaze</span></div>
+    <div class="date-badge" id="today-date"></div>
 </header>
-
-<!-- ① 本日開催 -->
-<div class="section">
-  <div class="section-label">本日開催</div>
-  <div id="basho-grid" class="basho-grid">
-    <div class="basho-loading">読み込み中...</div>
-  </div>
-</div>
 
 <!-- ② ランキング -->
 <div class="section">
-  <div class="section-label">絶好調ベスト3</div>
-  <div class="tab-bar">
-    <button class="tab-btn active" onclick="switchTab('today')">本日</button>
-    <button class="tab-btn" onclick="switchTab('yesterday')">昨日</button>
-    <button onclick="refreshRanking()" style="margin-left:auto;padding:4px 12px;border-radius:6px;border:1px solid #a0c8e0;background:#d0e8f0;font-size:12px;cursor:pointer;">🔄 更新</button>
-  </div>
-  <div id="rank-today" class="rank-list"><div class="rank-loading">集計中...</div></div>
-  <div id="rank-yesterday" class="rank-list" style="display:none"><div class="rank-loading">読み込み中...</div></div>
-  <button class="btn-input-result" onclick="openResultModal()">📥 途中結果を入力</button>
+    <div class="section-label">絶好調ベスト3</div>
+    <div class="tab-bar">
+        <button class="tab-btn active" onclick="switchTab('today')">本日</button>
+        <button class="tab-btn" onclick="switchTab('yesterday')">昨日</button>
+        <button onclick="refreshRanking()" style="margin-left:auto;padding:4px 12px;border-radius:6px;border:1px solid #a0c8e0;background:#d0e8f0;font-size:12px;cursor:pointer;">🔄 更新</button>
+    </div>
+    <div id="rank-today" class="rank-list"><div class="rank-loading">集計中...</div></div>
+    <div id="rank-yesterday" class="rank-list" style="display:none"><div class="rank-loading">読み込み中...</div></div>
+    <button class="btn-input-result" onclick="openResultModal()">📬 途中結果を入力</button>
+</div>
+
+<!-- 1号艇1着率ランキング -->
+<div class="section">
+    <div class="section-label">🥇 1号艇1着率ベスト3</div>
+    <div class="tab-bar">
+        <button class="tab-btn active" onclick="switchBoat1Tab('today')">本日</button>
+        <button class="tab-btn" onclick="switchBoat1Tab('yesterday')">昨日</button>
+        <button onclick="refreshBoat1()" style="margin-left:auto;padding:4px 12px;border-radius:6px;border:1px solid #a0c8e0;background:#d0e8f0;font-size:12px;cursor:pointer;">🔄 更新</button>
+    </div>
+    <div id="boat1-today" class="rank-list"><div class="rank-loading">集計中...</div></div>
+    <div id="boat1-yesterday" class="rank-list" style="display:none"><div class="rank-loading">読み込み中...</div></div>
+</div>
+
+<!-- ① 本日開催 -->
+<div class="section">
+    <div class="section-label">本日開催</div>
+    <div id="basho-grid" class="basho-grid">
+        <div class="basho-loading">読み込み中...</div>
+    </div>
 </div>
 
 <!-- ③ 予想エンジン -->
 <div class="section">
-  <div class="section-label">予想エンジン</div>
-  <div class="engine-form">
-    <div>
-      <div class="input-label">競艇場</div>
-      <select id="select-basho">
-        <option value="">選択してください</option>
-        {% for code, name in basho.items() %}
-        <option value="{{ code }}">{{ name }}</option>
-        {% endfor %}
-      </select>
-    </div>
-    <div>
-      <div class="input-label">レース番号</div>
-      <select id="select-race">
-        {% for i in range(1, 13) %}
-        <option value="{{ i }}">{{ i }}R</option>
-        {% endfor %}
-      </select>
-    </div>
-    <div>
-      <div class="input-label">直前情報（手入力）</div>
-      <div class="boats-grid">
-        {% for i in range(1, 7) %}
-        <div class="boat-card">
-          <div class="boat-waku">{{ i }}号艇</div>
-          <input type="number" step="0.01" placeholder="展示T" id="ex{{ i }}" style="margin-bottom:4px">
-          <input type="number" step="0.01" placeholder="本番ST" id="st{{ i }}">
+    <div class="section-label">予想エンジン</div>
+    <div class="engine-form">
+        <div>
+            <div class="input-label">競艇場</div>
+            <select id="select-basho">
+                <option value="">選択してください</option>
+                {% for code, name in basho.items() %}
+                <option value="{{ code }}">{{ name }}</option>
+                {% endfor %}
+            </select>
         </div>
-        {% endfor %}
-      </div>
+        <div>
+            <div class="input-label">レース番号</div>
+            <select id="select-race">
+                {% for i in range(1, 13) %}
+                <option value="{{ i }}">{{ i }}R</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div>
+            <div class="input-label">直前情報（手入力）</div>
+            <div class="boats-grid">
+                {% for i in range(1, 7) %}
+                <div class="boat-card">
+                    <div class="boat-waku">{{ i }}号艇</div>
+                    <input type="number" step="0.01" placeholder="展示タイム" id="ex{{ i }}" style="margin-bottom:4px">
+                    <input type="number" step="0.01" placeholder="展示ST" id="st{{ i }}">
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        <div>
+            <div class="input-label">直前情報（スクショ）</div>
+            <div class="upload-area" onclick="document.getElementById('img-upload').click()">
+                <div class="icon">📷</div>
+                スクショを添付（自動読み込み）<br>
+                <span style="font-size:11px;color:var(--muted)">※近日実装予定</span>
+            </div>
+            <input type="file" id="img-upload" accept="image/*" style="display:none">
+        </div>
+        <button class="btn-predict" onclick="predict()">予想する→</button>
     </div>
-    <div>
-      <div class="input-label">直前情報（スクショ）</div>
-      <div class="upload-area" onclick="document.getElementById('img-upload').click()">
-        <div class="icon">📷</div>
-        スクショを添付（自動読み込み）<br>
-        <span style="font-size:11px;color:var(--muted)">※近日実装予定</span>
-      </div>
-      <input type="file" id="img-upload" accept="image/*" style="display:none">
-    </div>
-    <button class="btn-predict" onclick="predict()">予想する →</button>
-  </div>
 </div>
 
 <div class="loading" id="loading">
-  <div class="loading-dot">・・・</div>
-  <div style="margin-top:12px;font-size:13px">予想計算中</div>
+    <div class="loading-dot">・・・</div>
+    <div style="margin-top:12px;font-size:13px">予想計算中</div>
 </div>
 
 <div class="result-section" id="result-section">
-  <div class="section-label">予想結果</div>
-  <div class="result-header" id="result-header"></div>
-  <div class="pattern-block">
-    <div class="pattern-title">PATTERN A — 確率上位12点</div>
-    <div class="tickets-grid" id="tickets-a"></div>
-  </div>
-  <div class="pattern-block">
-    <div class="pattern-title">PATTERN B — 会場補正12点</div>
-    <div class="tickets-grid" id="tickets-b"></div>
-  </div>
+    <div class="section-label">予想結果</div>
+    <div class="result-header" id="result-header"></div>
+    <div class="pattern-block">
+        <div class="pattern-title">PATTERN A - 確率上位12点</div>
+        <div class="tickets-grid" id="tickets-a"></div>
+    </div>
+    <div class="pattern-block">
+        <div class="pattern-title">PATTERN B - 会場補正12点</div>
+        <div class="tickets-grid" id="tickets-b"></div>
+    </div>
 </div>
 
 <!-- 結果入力モーダル -->
 <div class="modal-overlay" id="modal-overlay" onclick="if(event.target===this)closeModal()">
-  <div class="modal">
-    <div class="modal-title">途中結果を入力</div>
-    <div class="modal-select-row">
-      <select id="modal-jcd">
-        <option value="">会場を選択</option>
-        {% for code, name in basho.items() %}
-        <option value="{{ code }}">{{ name }}</option>
-        {% endfor %}
-      </select>
+    <div class="modal">
+        <div class="modal-title">途中結果を入力</div>
+        <div class="modal-select-row">
+            <select id="modal-jcd">
+                <option value="">会場を選択</option>
+                {% for code, name in basho.items() %}
+                <option value="{{ code }}">{{ name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div id="modal-races"></div>
+        <div class="modal-actions">
+            <button class="btn-modal-cancel" onclick="closeModal()">キャンセル</button>
+            <button class="btn-modal-save" onclick="saveResults()">保存する</button>
+        </div>
     </div>
-    <div id="modal-races">
-      <!-- レース入力行 -->
-    </div>
-    <div class="modal-actions">
-      <button class="btn-modal-cancel" onclick="closeModal()">キャンセル</button>
-      <button class="btn-modal-save" onclick="saveResults()">保存する</button>
-    </div>
-  </div>
 </div>
 
 <div class="toast" id="toast"></div>
@@ -306,184 +298,233 @@ const y = jst.getUTCFullYear();
 const m = String(jst.getUTCMonth()+1).padStart(2,'0');
 const d = String(jst.getUTCDate()).padStart(2,'0');
 const todayStr = `${y}${m}${d}`;
-    const yDate = new Date(jst); yDate.setUTCDate(yDate.getUTCDate()-1);
-    const yy = yDate.getUTCFullYear(); const ym = String(yDate.getUTCMonth()+1).padStart(2,"0"); const yd = String(yDate.getUTCDate()).padStart(2,"0");
-    const yesterdayStr = `${yy}${ym}${yd}`;
+const yDate = new Date(jst); yDate.setUTCDate(yDate.getUTCDate()-1);
+const yy = yDate.getUTCFullYear();
+const ym = String(yDate.getUTCMonth()+1).padStart(2,"0");
+const yd = String(yDate.getUTCDate()).padStart(2,"0");
+const yesterdayStr = `${yy}${ym}${yd}`;
 document.getElementById("today-date").textContent = `${y}.${m}.${d}`;
 
 // ① 本日開催
 async function loadTodayBasho() {
-  const url = `https://boatraceopenapi.github.io/programs/v2/${y}/${todayStr}.json`;
-  const grid = document.getElementById("basho-grid");
-  try {
-    const res = await fetch(url);
-    if (!res.ok) throw new Error("404");
-    const data = await res.json();
-    const codes = [...new Set(
-      (data.programs || []).map(p => String(p.race_stadium_number).padStart(2,'0'))
-    )].sort();
-    grid.innerHTML = "";
-    if (codes.length === 0) {
-      grid.innerHTML = '<div class="basho-loading">本日の開催情報なし</div>';
-      return;
+    const url = `https://boatraceopenapi.github.io/programs/v2/${y}/${todayStr}.json`;
+    const grid = document.getElementById("basho-grid");
+    try {
+        const res = await fetch(url);
+        if (!res.ok) throw new Error("404");
+        const data = await res.json();
+        const codes = [...new Set((data.programs || []).map(p => String(p.race_stadium_number).padStart(2,'0')))].sort();
+        grid.innerHTML = '';
+        if (codes.length === 0) {
+            grid.innerHTML = '<div class="basho-loading">本日の開催情報なし</div>';
+            return;
+        }
+        codes.forEach(code => {
+            const chip = document.createElement("div");
+            chip.className = "basho-chip";
+            chip.innerHTML = `<div class="code">${code}</div>${BASHO[code] || code}`;
+            chip.onclick = () => {
+                document.getElementById("select-basho").value = code;
+                document.querySelectorAll(".basho-chip").forEach(c => c.classList.remove("active"));
+                chip.classList.add("active");
+                document.querySelector(".engine-form").scrollIntoView({behavior:"smooth"});
+            };
+            grid.appendChild(chip);
+        });
+    } catch(e) {
+        grid.innerHTML = '<div class="basho-loading">取得できませんでした</div>';
     }
-    codes.forEach(code => {
-      const chip = document.createElement("div");
-      chip.className = "basho-chip";
-      chip.innerHTML = `<div class="code">${code}</div>${BASHO[code] || code}`;
-      chip.onclick = () => {
-        document.getElementById("select-basho").value = code;
-        document.querySelectorAll(".basho-chip").forEach(c => c.classList.remove("active"));
-        chip.classList.add("active");
-        document.querySelector(".engine-form").scrollIntoView({behavior:"smooth"});
-      };
-      grid.appendChild(chip);
-    });
-  } catch(e) {
-    grid.innerHTML = '<div class="basho-loading">取得できませんでした</div>';
-  }
 }
 
-// ② ランキング（サーバーから取得）
+// ② ランキング
 async function loadRanking(endpoint, containerId) {
-  const container = document.getElementById(containerId);
-  try {
-    const res = await fetch(endpoint);
-    const data = await res.json();
-    container.innerHTML = "";
-    if (!data || data.length === 0) {
-      container.innerHTML = '<div class="rank-loading">データなし（結果入力後に更新されます）</div>';
-      return;
+    const container = document.getElementById(containerId);
+    try {
+        const res = await fetch(endpoint);
+        const data = await res.json();
+        if (!data || data.length === 0) {
+            container.innerHTML = '<div class="rank-loading">データなし（結果入力後に更新されます）</div>';
+            return;
+        }
+        const colors = ["gold","silver","bronze"];
+        container.innerHTML = '';
+        data.forEach((item, i) => {
+            const isGood = item.return_rate >= 100;
+            container.innerHTML += `
+            <div class="rank-item">
+                <div class="rank-num ${colors[i]}">${i+1}</div>
+                <div class="rank-name">${item.name}</div>
+                <div class="rank-stats">
+                    <div class="rank-return ${isGood?'':'bad'}">${item.return_rate.toFixed(1)}%</div>
+                    <div class="rank-hit">的中率 ${item.hit_rate.toFixed(1)}% (${item.total}R)</div>
+                </div>
+            </div>`;
+        });
+    } catch(e) {
+        container.innerHTML = '<div class="rank-loading">取得エラー</div>';
     }
-    const colors = ["gold","silver","bronze"];
-    data.forEach((item, i) => {
-      const isGood = item.return_rate >= 100;
-      container.innerHTML += `
-        <div class="rank-item">
-          <div class="rank-num ${colors[i]}">${i+1}</div>
-          <div class="rank-name">${item.name}</div>
-          <div class="rank-stats">
-            <div class="rank-return ${isGood?'':'bad'}">${item.return_rate.toFixed(1)}%</div>
-            <div class="rank-hit">的中率 ${item.hit_rate.toFixed(1)}% (${item.total}R)</div>
-          </div>
-        </div>`;
-    });
-  } catch(e) {
-    container.innerHTML = '<div class="rank-loading">取得エラー</div>';
-  }
+}
+
+// 1号艇ランキング
+async function loadBoat1Ranking(endpoint, containerId) {
+    const container = document.getElementById(containerId);
+    try {
+        const res = await fetch(endpoint);
+        const data = await res.json();
+        if (!data || data.length === 0) {
+            container.innerHTML = '<div class="rank-loading">データなし</div>';
+            return;
+        }
+        const colors = ["gold","silver","bronze"];
+        container.innerHTML = '';
+        data.forEach((item, i) => {
+            container.innerHTML += `
+            <div class="rank-item">
+                <div class="rank-num ${colors[i]}">${i+1}</div>
+                <div class="rank-name">${item.name}</div>
+                <div class="rank-stats">
+                    <div class="rank-return">${item.boat1_rate.toFixed(1)}%</div>
+                    <div class="rank-hit">${item.boat1_win}/${item.total}R</div>
+                </div>
+            </div>`;
+        });
+    } catch(e) {
+        container.innerHTML = '<div class="rank-loading">取得エラー</div>';
+    }
 }
 
 // タブ切り替え
 let yesterdayLoaded = false;
+let boat1YesterdayLoaded = false;
+
 function refreshRanking() {
-        document.getElementById("rank-today").innerHTML = '<div class="rank-loading">集計中...</div>';
-        yesterdayLoaded = false;
-        loadRanking(`/api/ranking/${todayStr}`, "rank-today");
-    }
+    document.getElementById("rank-today").innerHTML = '<div class="rank-loading">集計中...</div>';
+    yesterdayLoaded = false;
+    loadRanking(`/api/ranking/${todayStr}`, "rank-today");
+}
+
+function refreshBoat1() {
+    document.getElementById("boat1-today").innerHTML = '<div class="rank-loading">集計中...</div>';
+    boat1YesterdayLoaded = false;
+    loadBoat1Ranking(`/api/ranking/boat1/${todayStr}`, "boat1-today");
+}
+
 function switchTab(tab) {
-  document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
-  document.querySelector(`.tab-btn[onclick="switchTab('${tab}')"]`).classList.add("active");
-  if (tab === "today") {
-    document.getElementById("rank-today").style.display = "flex";
-    document.getElementById("rank-yesterday").style.display = "none";
-  } else {
-    document.getElementById("rank-today").style.display = "none";
-    document.getElementById("rank-yesterday").style.display = "flex";
-    if (!yesterdayLoaded) {
-      yesterdayLoaded = true;
-      loadRanking(`/api/ranking/${yesterdayStr}`, "rank-yesterday");
+    document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+    document.querySelector(`.tab-btn[onclick="switchTab('${tab}')"]`).classList.add("active");
+    if (tab === "today") {
+        document.getElementById("rank-today").style.display = "flex";
+        document.getElementById("rank-yesterday").style.display = "none";
+    } else {
+        document.getElementById("rank-today").style.display = "none";
+        document.getElementById("rank-yesterday").style.display = "flex";
+        if (!yesterdayLoaded) {
+            yesterdayLoaded = true;
+            loadRanking(`/api/ranking/${yesterdayStr}`, "rank-yesterday");
+        }
     }
-  }
+}
+
+function switchBoat1Tab(tab) {
+    document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+    document.querySelector(`.tab-btn[onclick="switchBoat1Tab('${tab}')"]`).classList.add("active");
+    if (tab === "today") {
+        document.getElementById("boat1-today").style.display = "flex";
+        document.getElementById("boat1-yesterday").style.display = "none";
+    } else {
+        document.getElementById("boat1-today").style.display = "none";
+        document.getElementById("boat1-yesterday").style.display = "flex";
+        if (!boat1YesterdayLoaded) {
+            boat1YesterdayLoaded = true;
+            loadBoat1Ranking(`/api/ranking/boat1/${yesterdayStr}`, "boat1-yesterday");
+        }
+    }
 }
 
 // 結果入力モーダル
 function openResultModal() {
-  // レース入力行を生成
-  const container = document.getElementById("modal-races");
-  container.innerHTML = "";
-  for (let i = 1; i <= 12; i++) {
-    container.innerHTML += `
-      <div class="modal-row">
-        <label>${i}R</label>
-        <input type="text" id="tri-${i}" placeholder="1-2-3" maxlength="5">
-        <input type="number" id="pay-${i}" placeholder="配当" class="pay-input">
-      </div>`;
-  }
-  document.getElementById("modal-overlay").classList.add("show");
+    const container = document.getElementById("modal-races");
+    container.innerHTML = '';
+    for (let i = 1; i <= 12; i++) {
+        container.innerHTML += `
+        <div class="modal-row">
+            <label>${i}R</label>
+            <input type="text" id="tri-${i}" placeholder="1-2-3" maxlength="5">
+            <input type="number" id="pay-${i}" placeholder="払戻" class="pay-input">
+        </div>`;
+    }
+    document.getElementById("modal-overlay").classList.add("show");
 }
 
 function closeModal() {
-  document.getElementById("modal-overlay").classList.remove("show");
+    document.getElementById("modal-overlay").classList.remove("show");
 }
 
 async function saveResults() {
-  const jcd = document.getElementById("modal-jcd").value;
-  if (!jcd) { alert("会場を選択してください"); return; }
-
-  const races = [];
-  for (let i = 1; i <= 12; i++) {
-    const tri = document.getElementById(`tri-${i}`).value.trim();
-    const pay = parseInt(document.getElementById(`pay-${i}`).value) || 0;
-    if (tri) races.push({ rno: i, trifecta: tri, payout: pay });
-  }
-  if (races.length === 0) { alert("結果を入力してください"); return; }
-
-  const res = await fetch("/api/results", {
-    method: "POST",
-    headers: {"Content-Type": "application/json"},
-    body: JSON.stringify({ date: todayStr, jcd, races })
-  });
-  const data = await res.json();
-  closeModal();
-  showToast(`${races.length}レース保存しました`);
-  // ランキング更新
-  loadRanking(`/api/ranking/${todayStr}`, "rank-today");
+    const jcd = document.getElementById("modal-jcd").value;
+    if (!jcd) { alert("会場を選択してください"); return; }
+    const races = [];
+    for (let i = 1; i <= 12; i++) {
+        const tri = document.getElementById(`tri-${i}`).value.trim();
+        const pay = parseInt(document.getElementById(`pay-${i}`).value) || 0;
+        if (tri) races.push({ rno: i, trifecta: tri, payout: pay });
+    }
+    if (races.length === 0) { alert("結果を入力してください"); return; }
+    const res = await fetch("/api/results", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({ date: todayStr, jcd, races })
+    });
+    const data = await res.json();
+    closeModal();
+    showToast(`${races.length}レース保存しました`);
+    loadRanking(`/api/ranking/${todayStr}`, "rank-today");
 }
 
 function showToast(msg) {
-  const t = document.getElementById("toast");
-  t.textContent = msg;
-  t.classList.add("show");
-  setTimeout(() => t.classList.remove("show"), 2500);
+    const t = document.getElementById("toast");
+    t.textContent = msg;
+    t.classList.add("show");
+    setTimeout(() => t.classList.remove("show"), 2500);
 }
 
 // ③ 予想
 function predict() {
-  const basho = document.getElementById("select-basho").value;
-  const race = document.getElementById("select-race").value;
-  if (!basho) { alert("競艇場を選択してください"); return; }
-  document.getElementById("loading").classList.add("show");
-  document.getElementById("result-section").classList.remove("show");
-  const boats = [];
-  for (let i = 1; i <= 6; i++) {
-    boats.push({
-      waku: i,
-      ex_time: parseFloat(document.getElementById(`ex${i}`).value) || null,
-      actual_st: parseFloat(document.getElementById(`st${i}`).value) || null,
+    const basho = document.getElementById("select-basho").value;
+    const race = document.getElementById("select-race").value;
+    if (!basho) { alert("競艇場を選択してください"); return; }
+    document.getElementById("loading").classList.add("show");
+    document.getElementById("result-section").classList.remove("show");
+    const boats = [];
+    for (let i = 1; i <= 6; i++) {
+        boats.push({
+            waku: i,
+            ex_time: parseFloat(document.getElementById(`ex${i}`).value) || null,
+            actual_st: parseFloat(document.getElementById(`st${i}`).value) || null,
+        });
+    }
+    fetch("/api/yosou", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({basho, race_no: race, boats})
+    }).then(r => r.json()).then(data => {
+        document.getElementById("loading").classList.remove("show");
+        document.getElementById("result-header").textContent = `${data.basho} ${data.race_no}R / 各12点 計1,200円`;
+        const fillTickets = (id, list, cls) => {
+            const el = document.getElementById(id);
+            el.innerHTML = list.map(t => `<div class="ticket ${cls}">${t}</div>`).join('');
+        };
+        fillTickets("tickets-a", data.pattern_a, "");
+        fillTickets("tickets-b", data.pattern_b, "pattern-b");
+        document.getElementById("result-section").classList.add("show");
+        document.getElementById("result-section").scrollIntoView({behavior:"smooth"});
     });
-  }
-  fetch("/api/yosou", {
-    method: "POST",
-    headers: {"Content-Type": "application/json"},
-    body: JSON.stringify({basho, race_no: race, boats})
-  }).then(r => r.json()).then(data => {
-    document.getElementById("loading").classList.remove("show");
-    document.getElementById("result-header").textContent =
-      `${data.basho}  ${data.race_no}R  ／  各12点 計1,200円`;
-    const fillTickets = (id, list, cls) => {
-      const el = document.getElementById(id);
-      el.innerHTML = list.map(t => `<div class="ticket ${cls}">${t}</div>`).join("");
-    };
-    fillTickets("tickets-a", data.pattern_a, "");
-    fillTickets("tickets-b", data.pattern_b, "pattern-b");
-    document.getElementById("result-section").classList.add("show");
-    document.getElementById("result-section").scrollIntoView({behavior:"smooth"});
-  });
 }
 
 // 初期ロード
 loadTodayBasho();
 loadRanking(`/api/ranking/${todayStr}`, "rank-today");
+loadBoat1Ranking(`/api/ranking/boat1/${todayStr}`, "boat1-today");
 </script>
 </body>
 </html>
