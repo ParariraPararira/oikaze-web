@@ -201,6 +201,7 @@
   <div class="tab-bar">
     <button class="tab-btn active" onclick="switchTab('today')">本日</button>
     <button class="tab-btn" onclick="switchTab('yesterday')">昨日</button>
+    <button onclick="refreshRanking()" style="margin-left:auto;padding:4px 12px;border-radius:6px;border:1px solid #a0c8e0;background:#d0e8f0;font-size:12px;cursor:pointer;">🔄 更新</button>
   </div>
   <div id="rank-today" class="rank-list"><div class="rank-loading">集計中...</div></div>
   <div id="rank-yesterday" class="rank-list" style="display:none"><div class="rank-loading">読み込み中...</div></div>
@@ -374,6 +375,11 @@ async function loadRanking(endpoint, containerId) {
 
 // タブ切り替え
 let yesterdayLoaded = false;
+function refreshRanking() {
+        document.getElementById("rank-today").innerHTML = '<div class="rank-loading">集計中...</div>';
+        yesterdayLoaded = false;
+        loadRanking(`/api/ranking/${todayStr}`, "rank-today");
+    }
 function switchTab(tab) {
   document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
   document.querySelector(`.tab-btn[onclick="switchTab('${tab}')"]`).classList.add("active");
